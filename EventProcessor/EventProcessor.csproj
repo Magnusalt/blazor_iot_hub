@@ -8,14 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Protobuf Include="..\DataTransport\Protos\*.proto" GrpcServices="Server" />
+        <PackageReference Include="Grpc.AspNetCore" Version="2.48.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
-    </ItemGroup>
-
-    <ItemGroup>
+      <ProjectReference Include="..\DataTransport\DataTransport.csproj" />
       <ProjectReference Include="..\Models\Models.csproj" />
     </ItemGroup>
 

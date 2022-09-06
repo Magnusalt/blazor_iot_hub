@@ -1,7 +1,7 @@
-﻿using DataTransport;
-using Grpc.Core;
+﻿using Grpc.Core;
+using Microsoft.Extensions.Hosting;
 
-namespace DeviceHub;
+namespace DataTransport;
 
 public class EventReceiver : BackgroundService
 {
@@ -28,8 +28,8 @@ public class EventReceiver : BackgroundService
     private async Task StartSubscribing(CancellationToken cancellationToken)
     {
         Console.WriteLine($"Client {_clientId} started to receive events");
-        var sub = _client.Subscribe(new Subscriber { Id = _clientId }, cancellationToken: cancellationToken);
-        await foreach (var e in sub.ResponseStream.ReadAllAsync(cancellationToken))
+        var subscription = _client.Subscribe(new Subscriber { Id = _clientId }, cancellationToken: cancellationToken);
+        await foreach (var e in subscription.ResponseStream.ReadAllAsync(cancellationToken))
         {
             var payload = e.Payload.ToByteArray();
             Console.WriteLine($"{e.SourceId} said: {payload[0]}{payload[1]}");

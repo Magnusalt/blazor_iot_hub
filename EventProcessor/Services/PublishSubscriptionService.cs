@@ -1,8 +1,6 @@
 ﻿using System.Threading.Channels;
 using DataTransport;
-using Google.Protobuf;
 using Grpc.Core;
-using Event = Models.Event;
 
 namespace EventProcessor.Services;
 
@@ -17,7 +15,7 @@ public class PublishSubscriptionService : PubSub.PubSubBase
         _subscribers = new Dictionary<Guid, Channel<Event>>();
     }
 
-    public override async Task Subscribe(Subscriber request, IServerStreamWriter<DataTransport.Event> responseStream,
+    public override async Task Subscribe(Subscriber request, IServerStreamWriter<Event> responseStream,
         ServerCallContext context)
     {
         var readerChannel = Channel.CreateUnbounded<Event>();
@@ -25,8 +23,7 @@ public class PublishSubscriptionService : PubSub.PubSubBase
 
         await foreach (var e in readerChannel.Reader.ReadAllAsync())
         {
-            await responseStream.WriteAsync(new DataTransport.Event
-                { Id = e.Id.ToString(), Payload = ByteString.CopyFrom(e.Payload), SourceId = e.SourceId.ToString() });
+            await responseStream.WriteAsync(e);
         }
     }
 
@@ -42,13 +39,13 @@ public class PublishSubscriptionService : PubSub.PubSubBase
         return Task.FromResult(new Unsubscription { Id = Guid.NewGuid().ToString() });
     }
 
-    public override async Task<PublishResult> Publish(DataTransport.Event request, ServerCallContext context)
+    public override async Task<PublishResult> Publish(Event request, ServerCallContext context)
     {
         try
         {
             foreach (var (_, channel) in _subscribers)
             {
-                await channel.Writer.WriteAsync(new Event(Guid.Parse(request.SourceId), request.Payload.ToByteArray()));
+                await channel.Writer.WriteAsync(request);
             }
 
             return new PublishResult { Ok = true };

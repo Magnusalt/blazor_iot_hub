@@ -8,7 +8,7 @@ public class Event
         Payload = payload;
     }
 
-    public Guid Id => Guid.NewGuid();
+    public static Guid Id => Guid.NewGuid();
     public Guid SourceId { get; }
     public byte[] Payload { get; }
 }

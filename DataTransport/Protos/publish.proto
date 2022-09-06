@@ -23,6 +23,5 @@ message PublishResult{
 message Event{
   string id = 1;
   string sourceId = 2;
-  string targetId = 3;
   bytes payload = 4;
 }

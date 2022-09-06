@@ -7,4 +7,12 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Grpc.Net.ClientFactory" Version="2.48.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DataTransport\DataTransport.csproj" />
+    </ItemGroup>
+
 </Project>
