@@ -1,0 +1,28 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "DataTransport";
+
+service PubSub{
+  rpc Subscribe (Subscriber) returns (stream Event);
+  rpc Unsubscribe (Subscriber) returns (Unsubscription);
+  rpc Publish (Event) returns (PublishResult);
+}
+
+message Subscriber{
+  string id = 1;
+}
+
+message Unsubscription{
+  string id = 1;
+}
+
+message PublishResult{
+  bool ok = 1;
+}
+
+message Event{
+  string id = 1;
+  string sourceId = 2;
+  string targetId = 3;
+  bytes payload = 4;
+}
