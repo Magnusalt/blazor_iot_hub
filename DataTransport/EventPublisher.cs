@@ -1,4 +1,4 @@
-﻿using ApplicationInterfaces;
+﻿using System.Text.Json;
 using Google.Protobuf;
 
 namespace DataTransport;
@@ -12,13 +12,17 @@ public class EventPublisher : IEventPublisher
         _client = client;
     }
 
-    public async Task<Models.PublishResult> Publish(Models.Event @event)
+    public async Task<bool> Publish(IIntegrationEvent @event)
     {
+        await using var jsonStream = new MemoryStream();
+        await JsonSerializer.SerializeAsync(jsonStream, @event);
         var result = await _client.PublishAsync(new Event
         {
-            Id = Models.Event.Id.ToString(), Payload = ByteString.CopyFrom(@event.Payload),
-            SourceId = @event.SourceId.ToString()
+            Id = @event.Id.ToString(),
+            Payload = ByteString.CopyFrom(jsonStream.ToArray()),
+            SourceId = @event.SourceId.ToString(),
+            Name = @event.Name
         });
-        return new Models.PublishResult { Ok = result.Ok };
+        return true;
     }
 }

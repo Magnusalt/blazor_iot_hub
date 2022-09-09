@@ -9,10 +9,10 @@ public class PublishSubscriptionService : PubSub.PubSubBase
     private readonly ILogger<PublishSubscriptionService> _logger;
     private readonly Dictionary<Guid, Channel<Event>> _subscribers;
 
-    public PublishSubscriptionService(ILogger<PublishSubscriptionService> logger)
+    public PublishSubscriptionService(ILogger<PublishSubscriptionService> logger, Dictionary<Guid, Channel<Event>> subscribers)
     {
         _logger = logger;
-        _subscribers = new Dictionary<Guid, Channel<Event>>();
+        _subscribers = subscribers;
     }
 
     public override async Task Subscribe(Subscriber request, IServerStreamWriter<Event> responseStream,
@@ -43,7 +43,7 @@ public class PublishSubscriptionService : PubSub.PubSubBase
     {
         try
         {
-            foreach (var (_, channel) in _subscribers)
+            foreach (var (_, channel) in _subscribers.Where(pair => pair.Key != Guid.Parse(request.SourceId)))
             {
                 await channel.Writer.WriteAsync(request);
             }

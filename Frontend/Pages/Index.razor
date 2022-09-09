@@ -1,7 +1,29 @@
 @page "/"
+@using DataTransport
+@inject IEventRelay _receiver
 
 <PageTitle>Index</PageTitle>
 
 <h1>Hello, world!</h1>
+<h2>
+    @_count.ToString()
+</h2>
 
 Welcome to your new app.
+
+@code
+{
+    private int _count;
+
+    protected override void OnInitialized()
+    {
+        _receiver.EventReceived += ReceiverOnEventReceived;
+        base.OnInitialized();
+    }
+
+    private void ReceiverOnEventReceived(object? sender, IntegrationEventArgs e)
+    {
+        _count++;
+        InvokeAsync(StateHasChanged);
+    }
+}
